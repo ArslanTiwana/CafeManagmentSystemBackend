@@ -1,0 +1,3 @@
+heroku remote:https://git.heroku.com/milkman-backend.git
+git push heroku
+heroku restart
