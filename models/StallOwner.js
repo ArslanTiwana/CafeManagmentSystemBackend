@@ -29,7 +29,12 @@ const StallOwnerSchema = new Schema({
     role:{
         type:String,
         required:true
-    }
+    },
+    stall:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'stall'
+    },
+
 
   });
   const StallOwner = mongoose.model('stallowner', StallOwnerSchema);
