@@ -1,7 +1,7 @@
 var jwt = require('jsonwebtoken');
-const JWT_SECRET = 'Milkman';
+const JWT_SECRET = 'CMN';
 
-const fetchcustomer = (req, res, next) => {
+const fetchstudent = (req, res, next) => {
     // Get the user from the jwt token and add id to req object
     const token = req.header('auth-token');
     if (!token) {
@@ -9,8 +9,8 @@ const fetchcustomer = (req, res, next) => {
     }
     try {
         const data = jwt.verify(token, JWT_SECRET);
-        req.customer = data.customer;
-        console.log(req.customer);
+        req.student = data.student;
+        console.log(req.student);
         next();
     } catch (error) {
         res.status(401).send({ error: "Please authenticate using a valid token" })
@@ -19,4 +19,4 @@ const fetchcustomer = (req, res, next) => {
 }
 
 
-module.exports = fetchcustomer;
+module.exports = fetchstudent;

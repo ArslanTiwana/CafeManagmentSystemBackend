@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const SellerSchema = new Schema({
+const StallOwnerSchema = new Schema({
     name:{
         type: String,
         required: true
@@ -20,22 +20,17 @@ const SellerSchema = new Schema({
         type: String,
         required: true
     },
-    areas:{
-        type: [String],
-        required: true
-    },
-    company_name:{
+    stall_location:{
         type:String
-    },
-    milk_rate:{
-        type:Number,
-        required:true
     },
     otp:{
         type:Number
+    },
+    role:{
+        type:String,
+        required:true
     }
-   
-   
+
   });
-  const Seller = mongoose.model('seller', SellerSchema);
-  module.exports = Seller;
+  const StallOwner = mongoose.model('stallowner', StallOwnerSchema);
+  module.exports = StallOwner;
