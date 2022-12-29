@@ -13,12 +13,10 @@ app.use('/assets',express.static('assets'));
 app.use('/api/faculty', require('./routes/faculty'))
 app.use('/api/student', require('./routes/student'))
 app.use('/api/stallowner', require('./routes/stallowner'))
-
-
-
-
-
-
+app.use('/api/cafe', require('./routes/cafe'))
+app.use('/api/stall', require('./routes/stall'))
+app.use('/api/menu', require('./routes/menu'))
+app.use('/api/order', require('./routes/order'))
 
 app.listen(port, () => {
   console.log(`backend listening at http://localhost:${port}`)

@@ -9,8 +9,10 @@ const Order_MenuSchema = new Schema({
     order:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'order'
-    },
-    
+    }, 
+    qty:{
+        type:Number
+    }, 
   });
   const Order_Menu = mongoose.model('order_menu', Order_MenuSchema);
   module.exports = Order_Menu;

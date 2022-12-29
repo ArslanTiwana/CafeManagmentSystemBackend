@@ -2,9 +2,6 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const OrderSchema = new Schema({
-    total_price:{
-        type:Number
-    },
     status:{
         type:String
         // complete, pending, inprogress,On its Way 
@@ -24,7 +21,15 @@ const OrderSchema = new Schema({
     stall:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'stall'
-    },  
+    }, 
+    created_at:{
+        type: Date,
+        required: true,
+        default:Date.now()
+    },
+    preparation_time:{
+        type:Number
+    }, 
   });
   const Order = mongoose.model('order', OrderSchema);
   module.exports = Order;

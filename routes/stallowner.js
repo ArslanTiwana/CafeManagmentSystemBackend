@@ -57,11 +57,6 @@ router.post('/createstallowner', [
     if (stallowner) {
       return res.status(400).json({ error: "Sorry a stallowner with this phone number already exists" })
     }
-    // Check whether the stallowner with this RegNo exists already
-    stallowner = await StallOwner.findOne({ regNo: req.body.regNo });
-    if (stallowner) {
-      return res.status(400).json({ error: "Sorry a stallowner with this Reg No already exists" })
-    }
     // Check whether the stallowner with this email exists already
     stallowner = await StallOwner.findOne({ email: req.body.email });
     if (stallowner) {
@@ -76,7 +71,6 @@ router.post('/createstallowner', [
       password: secPass,
       phone_number: req.body.phone_number,
       email: req.body.email,
-      stall_location: req.body.stall_location,
       role:req.body.role
     });
     const data = {
@@ -158,11 +152,10 @@ router.get('/getstallowner', fetchstallowner, async (req, res) => {
 // ROUTE 4: Update an existing stallowner using: PUT "/api/stallowner/updatestallowner". stallownerUI
 router.put('/updatestallowner',
   fetchstallowner, async (req, res) => {
-    const { name, email, phone_number,stall_location } = req.body;
+    const { name, email, phone_number } = req.body;
     try {
       const newstallowner = {};
       if (name) { newstallowner.name = name };
-      if (stall_location) { newstallowner.stall_location = stall_location };
       if (email) {
         let stallowner = await StallOwner.findOne({ email: req.body.email });
         if (stallowner) {

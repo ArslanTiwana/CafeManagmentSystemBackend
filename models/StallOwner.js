@@ -20,20 +20,13 @@ const StallOwnerSchema = new Schema({
         type: String,
         required: true
     },
-    stall_location:{
-        type:String
-    },
     otp:{
         type:Number
     },
     role:{
         type:String,
         required:true
-    },
-    stall:{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'stall'
-    },
+    },  
 
 
   });

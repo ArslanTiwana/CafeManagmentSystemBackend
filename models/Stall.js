@@ -13,7 +13,10 @@ const StallSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'cafe'
     },
-   
+    stall_owner:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'stallowner'
+    },
   });
   const Stall = mongoose.model('stall', StallSchema);
   module.exports = Stall;

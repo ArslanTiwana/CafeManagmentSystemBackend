@@ -8,9 +8,7 @@ const CafeSchema = new Schema({
     },
     location:{
         type:String
-    },
-   
-   
+    }, 
   });
   const Cafe = mongoose.model('cafe', CafeSchema);
   module.exports = Cafe;

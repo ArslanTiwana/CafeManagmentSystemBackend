@@ -6,9 +6,6 @@ const MenuSchema = new Schema({
         type: String,
         required: true
     },
-    qty:{
-        type:Number
-    },
     price:{
         type:String
     },
@@ -16,14 +13,16 @@ const MenuSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'stall'
     },
-    status:{
+    status:{  //active or not
         type:String
     },
-    preparation_time:{
-        type:Number
+    
+    type:{   //desert,bevarage
+        type:String,
+        required: true
     }
    
    
   });
-  const Stall = mongoose.model('stall', StallSchema);
-  module.exports = Stall;
+  const Menu = mongoose.model('menu', MenuSchema);
+  module.exports = Menu;
