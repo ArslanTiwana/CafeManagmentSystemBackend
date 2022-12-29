@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Menu = require('../models/Menu');
+const Order_Menu = require('../models/Order_Menu');
 
 // ROUTE 1: Add new menu using: POST "/api/menu/addmenu". 
 router.post('/addmenu', async (req, res) => {
@@ -79,11 +80,10 @@ router.delete('/deletemenu/:id', async (req, res) => {
         let menu = await Menu.findById(req.params.id);
         if (!menu) { return res.status(404).send("Not Found") }
         menu = await Menu.findByIdAndDelete(req.params.id)
-        // stalls = await Stall.find({ menu: menu._id })
-        // for (let i = 0; i < stalls.length; i++) {
-        //     stalls[i].menu = null
-        //     let stall = await Stall.findByIdAndUpdate(stalls[i]._id, { $set: stalls[i] }, { new: true })
-        // }
+        let order_menu=await Order_Menu.find({menu:menu._id})
+        for(let i=0;i<order_menu.length;i++){
+            let a=await Order_Menu.findByIdAndDelete(order_menu[i]._id)
+        }
         res.json({ "Success": "menu has been deleted", menu: menu });
     } catch (error) {
         console.error(error.message);

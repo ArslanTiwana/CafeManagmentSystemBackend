@@ -27,7 +27,7 @@ const OrderSchema = new Schema({
         required: true,
         default:Date.now()
     },
-    preparation_time:{
+    prepairation_time:{
         type:Number
     }, 
   });

@@ -1,8 +1,12 @@
 const express = require('express');
 const Cafe = require('../models/Cafe');
+const Menu = require('../models/Menu');
+const Order = require('../models/Order');
 const router = express.Router();
 const Stall = require('../models/Stall');
 const StallOwner = require('../models/StallOwner');
+const Order_Menu = require('../models/Order_Menu');
+
 
 // ROUTE 1: Add new stall using: POST "/api/stall/addstall". 
 router.post('/addstall',async (req, res) => {
@@ -25,24 +29,29 @@ router.post('/addstall',async (req, res) => {
 router.get('/getallstall',async (req, res) => {
         try {
             const stalls = await Stall.find();
-             console.log(stalls);
-            let stallOwnerIds=[]
-            let cafeIds=[]
-            let stallOwners=[]
-            let cafes=[]
+        //      console.log(stalls);
+        //     let allstalls=[]
+        //     let stallOwnerIds=[]
+        //     let cafeIds=[]
+        //     let stallOwners=[]
+        //     let cafes=[]
 
-            let response
-            // for(let a=0;a<stalls.length;a++){
-            //     stallOwnerIds[a]=stalls[a].stall_owner
-            // }
-            // stallOwners = await StallOwner.find({_id:{ $in : stallOwnerIds }})
-            // for(let a=0;a<stalls.length;a++){
-            //     cafeIds[a]=stalls[a].cafe
-            // }
-            // cafes = await Cafe.find({_id:{ $in : cafeIds }})
-            
-            // console.log(cafes);
-            // res.json({stalls:stalls,stallOwners:stallOwners,cafes:cafes})
+
+        //     for(let a=0;a<stalls.length;a++){
+        //         stallOwnerIds[a]=stalls[a].stall_owner
+        //     }
+        //     stallOwners = await StallOwner.find({_id:{ $in : stallOwnerIds }})
+        //     for(let a=0;a<stalls.length;a++){
+        //         cafeIds[a]=stalls[a].cafe
+        //     }
+        //     cafes = await Cafe.find({_id:{ $in : cafeIds }})
+        //     for(let i=0;i<stalls.length;i++){
+        //         allstalls[i]={
+
+        //         }
+        //     console.log(cafes);
+        //     res.json({stalls:stalls,stallOwners:stallOwners,cafes:cafes})
+        // }
             res.json(stalls)
         } catch (error) {
             console.error(error.message);
@@ -97,8 +106,22 @@ router.put('/updatestall/:id', async (req, res) => {
 router.delete('/deletestall/:id',async (req, res) => {
     try {
         let stall = await Stall.findById(req.params.id);
+       
         if (!stall) { return res.status(404).send("Not Found") }
         stall = await Stall.findByIdAndDelete(req.params.id)
+        let menus=await Menu.find({stall:stall._id})
+        for(let i=0;i<menus.length;i++){
+            let a=await Menu.findByIdAndDelete(menus[i]._id)
+            let order_menu=await Order_Menu.find({menu:a._id})
+            console.log(order_menu[0]);
+            for(let j=0;j<order_menu.length;j++){
+                let l=await Order_Menu.findByIdAndDelete(order_menu[j]._id)
+            }
+        }
+        let orders=await Order.find({stall:stall._id})
+        for(let i=0;i<orders.length;i++){
+            let a=await Order.findByIdAndDelete(orders[i]._id)
+        }
         res.json({ Success: true, stall: stall });
     } catch (error) {
         console.error(error.message);

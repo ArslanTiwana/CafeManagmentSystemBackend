@@ -89,21 +89,81 @@ router.post('/getallorderbystall', async (req, res) => {
             }
         }
         res.json(allorders)
-
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send("Internal Server Error");
+    }
+})
+// ROUTE 4: get all order by student using: GET "/api/order/getallorderbystudent". 
+router.post('/getallorderbystudent', async (req, res) => {
+    try {
+        let allorders = []
+        const orders = await Order.find({ student: req.body.studentId });
+        for (let i = 0; i < orders.length; i++) {
+            const order_menu = await Order_Menu.find({ order: orders[i]._id })
+            let menus = []
+            let menu = []
+            let menuIds = []
+            for (let j = 0; j < order_menu.length; j++) {
+                menuIds[j] = order_menu[j].menu
+            }
+            menus = await Menu.find({ _id: { $in: menuIds } })
+            for (let j = 0; j < menus.length; j++) {
+                menu[j] = {
+                    menu: menus[j],
+                    qty: order_menu[j].qty
+                }
+            }
+            allorders[i] = {
+                order: orders[i],
+                menus: menu
+            }
+        }
+        res.json(allorders)
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send("Internal Server Error");
+    }
+})
+// ROUTE 5: get all order by faculty using: GET "/api/order/getallorderbyfaculty". 
+router.post('/getallorderbyfaculty', async (req, res) => {
+    try {
+        let allorders = []
+        const orders = await Order.find({ faculty: req.body.facultyId });
+        for (let i = 0; i < orders.length; i++) {
+            const order_menu = await Order_Menu.find({ order: orders[i]._id })
+            let menus = []
+            let menu = []
+            let menuIds = []
+            for (let j = 0; j < order_menu.length; j++) {
+                menuIds[j] = order_menu[j].menu
+            }
+            menus = await Menu.find({ _id: { $in: menuIds } })
+            for (let j = 0; j < menus.length; j++) {
+                menu[j] = {
+                    menu: menus[j],
+                    qty: order_menu[j].qty
+                }
+            }
+            allorders[i] = {
+                order: orders[i],
+                menus: menu
+            }
+        }
+        res.json(allorders)
     } catch (error) {
         console.error(error.message);
         res.status(500).send("Internal Server Error");
     }
 })
 
-// ROUTE 4: Update an existing order using: PUT "/api/order/updateorder". 
+// ROUTE 6: Update an existing order using: PUT "/api/order/updateorder". 
 router.put('/updateorder/:id', async (req, res) => {
     const { status, type, prepairationTime } = req.body;
     try {
         // Create a neworder object
         const neworder = {};
-
-        if (prepairationTime) { neworder.prepairationTime = prepairationTime };
+        if (prepairationTime) { neworder.prepairation_time = prepairationTime };
         if (status) { neworder.status = status };
         if (type) { neworder.type = type };
         // Find the order to be updated and update it
@@ -118,18 +178,17 @@ router.put('/updateorder/:id', async (req, res) => {
     }
 })
 
-// ROUTE 5: Delete an existing order using: DELETE "/api/order/deleteorder".
+// ROUTE 7: Delete an existing order using: DELETE "/api/order/deleteorder".
 router.delete('/deleteorder/:id', async (req, res) => {
     try {
-        let stalls = []
         let order = await Order.findById(req.params.id);
         if (!order) { return res.status(404).send("Not Found") }
         order = await Order.findByIdAndDelete(req.params.id)
-        // stalls = await Stall.find({ order: order._id })
-        // for (let i = 0; i < stalls.length; i++) {
-        //     stalls[i].order = null
-        //     let stall = await Stall.findByIdAndUpdate(stalls[i]._id, { $set: stalls[i] }, { new: true })
-        // }
+        let order_menu=await Order_Menu.find({order:order._id})
+        console.log(order_menu);
+        for(let i=0;i<order_menu.length;i++){
+            let a=await Order_Menu.findByIdAndDelete(order_menu[i]._id)
+        }
         res.json({ "Success": "order has been deleted", order: order });
     } catch (error) {
         console.error(error.message);
