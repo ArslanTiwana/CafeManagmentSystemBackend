@@ -20,6 +20,9 @@ const MenuSchema = new Schema({
     type:{   //desert,bevarage
         type:String,
         required: true
+    },
+    image:{
+        type:String,
     }
    
    

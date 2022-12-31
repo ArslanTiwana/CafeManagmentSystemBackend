@@ -2,8 +2,22 @@ const express = require('express');
 const router = express.Router();
 const Menu = require('../models/Menu');
 const Order_Menu = require('../models/Order_Menu');
+// const multer=require('multer')
 
-// ROUTE 1: Add new menu using: POST "/api/menu/addmenu". 
+// const storage=multer.diskStorage({
+//     destination:(req,file,callback)=>{
+//         callback(null,"./assets/MenuItemImages/")
+//     },
+//     filename:(req,file,callback)=>{
+//         callback(null,file.originalname)
+//     }
+// })
+//const upload=multer({storage:storage});
+
+
+// ROUTE 1: Add new menu using: POST "/api/menu/addmenu".
+//router.post('/addmenu',upload.single("image"), async (req, res) => {
+
 router.post('/addmenu', async (req, res) => {
     try {
         const { productName, qty,price,stallId,status,type } = req.body;
@@ -15,7 +29,8 @@ router.post('/addmenu', async (req, res) => {
             price:price,
             stall:stallId,
             status:status,
-            type:type
+            type:type,
+            //image:req.file.originalname,
             
         });
 
@@ -49,7 +64,8 @@ router.post('/getallmenubystall', async (req, res) => {
     }
 })
 
-// ROUTE 4: Update an existing menu using: PUT "/api/menu/updatemenu". 
+// ROUTE 4: Update an existing menu using: PUT "/api/menu/updatemenu".
+//router.put('/updatemenu/:id',upload.single("image"), async (req, res) => {
 router.put('/updatemenu/:id', async (req, res) => {
     const { productName, qty,price,stallId,status,type } = req.body;
     try {
@@ -61,6 +77,7 @@ router.put('/updatemenu/:id', async (req, res) => {
         if (stallId) { newmenu.stallId = stallId };
         if (status) { newmenu.status = status };
         if (type) { newmenu.type = type };
+
         // Find the menu to be updated and update it
         let menu = await Menu.findById(req.params.id);
         if (!menu) { return res.status(404).send("Not Found") }
