@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const FacultySchema = new Schema({
+const AdminSchema = new Schema({
     name:{
         type: String,
         required: true
@@ -20,19 +20,14 @@ const FacultySchema = new Schema({
         type: String,
         required: true
     },
-    office_location:{
-        type:String
-    },
     otp:{
         type:Number
     },
     role:{
         type:String,
         required:true,
-        default:"faculty"
+        default:"admin"
     }
-   
-   
   });
-  const Faculty = mongoose.model('faculty', FacultySchema);
-  module.exports = Faculty;
+  const Admin = mongoose.model('admin', AdminSchema);
+  module.exports = Admin;

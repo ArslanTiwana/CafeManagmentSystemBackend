@@ -1,10 +1,10 @@
 const express = require('express');
-const Faculty = require('../models/Faculty');
+const Admin = require('../models/Admin');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 var jwt = require('jsonwebtoken');
-var fetchfaculty = require('../middleware/fetchfaculty');
+var fetchadmin = require('../middleware/fetchadmin');
 const nodemailer = require('nodemailer')
 const JWT_SECRET = 'CMN';
 
@@ -40,8 +40,8 @@ const sendmail = async (name, email, otp) => {
   }
 }
 
-// ROUTE 1: Create a faculty account using: POST "/api/faculty/createfaculty". facultyUI
-router.post('/createfaculty', [
+// ROUTE 1: Create a admin account using: POST "/api/admin/createadmin". 
+router.post('/createadmin', [
   body('name', 'Enter a valid name min Character 3').isLength({ min: 3 }),
   body('email', 'Enter a valid email').isEmail(),
   body('password', 'Password must be atleast 5 characters').isLength({ min: 5 }),
@@ -52,26 +52,26 @@ router.post('/createfaculty', [
     return res.status(400).json({ errors: errors.array() });
   }
   try {
-    // Check whether the faculty with this phone_number exists already
-    let faculty = await Faculty.findOne({ phone_number: req.body.phone_number });
-    if (faculty) {
-      return res.status(400).json({ error: "Sorry a faculty with this phone number already exists" })
+    // Check whether the admin with this phone_number exists already
+    let admin = await Admin.findOne({ phone_number: req.body.phone_number });
+    if (admin) {
+      return res.status(400).json({ error: "Sorry a admin with this phone number already exists" })
     }
-    // Check whether the faculty with this RegNo exists already
-    faculty = await Faculty.findOne({ regNo: req.body.regNo });
-    if (faculty) {
-      return res.status(400).json({ error: "Sorry a faculty with this Reg No already exists" })
+    // Check whether the admin with this RegNo exists already
+    admin = await Admin.findOne({ regNo: req.body.regNo });
+    if (admin) {
+      return res.status(400).json({ error: "Sorry a admin with this Reg No already exists" })
     }
-    // Check whether the faculty with this email exists already
-    faculty = await Faculty.findOne({ email: req.body.email });
-    if (faculty) {
-      return res.status(400).json({ error: "Sorry a faculty with this email already exists" })
+    // Check whether the admin with this email exists already
+    admin = await Admin.findOne({ email: req.body.email });
+    if (admin) {
+      return res.status(400).json({ error: "Sorry a admin with this email already exists" })
     }
     const salt = await bcrypt.genSalt(10);
     const secPass = await bcrypt.hash(req.body.password, salt);
 
 
-    faculty = await Faculty.create({
+    admin = await Admin.create({
       name: req.body.name,
       password: secPass,
       phone_number: req.body.phone_number,
@@ -80,9 +80,9 @@ router.post('/createfaculty', [
       role:req.body.role
     });
     const data = {
-      faculty: {
-        id: faculty.id,
-        phone_number: faculty.phone_number,
+      admin: {
+        id: admin.id,
+        phone_number: admin.phone_number,
       }
     }
     const authtoken = jwt.sign(data, JWT_SECRET);
@@ -95,7 +95,7 @@ router.post('/createfaculty', [
 })
 
 
-// ROUTE 2: Authenticate a faculty using: POST "/api/faculty/login". facultyUI
+// ROUTE 2: Authenticate a admin using: POST "/api/admin/login". adminUI
 router.post('/login', [
   body('email', 'email cannot be blank').exists(),
   body('password', 'Password cannot be blank').exists(),
@@ -109,25 +109,25 @@ router.post('/login', [
 
   const { email, password } = req.body;
   try {
-    let faculty = await Faculty.findOne({ email });
-    if (!faculty) {
+    let admin = await Admin.findOne({ email });
+    if (!admin) {
       success = false
       return res.status(400).json({ error: "Please try to login with correct credentials" });
     }
 
-    const passwordCompare = await bcrypt.compare(password, faculty.password);
+    const passwordCompare = await bcrypt.compare(password, admin.password);
     if (!passwordCompare) {
       success = false
       return res.status(400).json({ success, error: "Please try to login with correct credentials" });
     }
 
     const data = {
-      faculty: {
-        id: faculty.id,
-        name: faculty.name,
-        phone_number: faculty.phone_number,
-        email: faculty.email,
-        office_location: faculty.office_location
+      admin: {
+        id: admin.id,
+        name: admin.name,
+        phone_number: admin.phone_number,
+        email: admin.email,
+        office_location: admin.office_location
       }
     }
     const authtoken = jwt.sign(data, JWT_SECRET);
@@ -143,58 +143,58 @@ router.post('/login', [
 });
 
 
-// ROUTE 3: Get  faculty Details using: POST "/api/faculty/getfaculty". facultyUI
-router.get('/getfaculty', fetchfaculty, async (req, res) => {
+// ROUTE 3: Get  admin Details using: POST "/api/admin/getadmin". adminUI
+router.get('/getadmin', fetchadmin, async (req, res) => {
 
   try {
-    const facultyId = req.faculty.id;
-    const faculty = await Faculty.findById(facultyId).select("-password")
-    res.send(faculty)
+    const adminId = req.admin.id;
+    const admin = await Admin.findById(adminId).select("-password")
+    res.send(admin)
   } catch (error) {
     console.error(error.message);
     res.status(500).send("Internal Server Error");
   }
 })
 
-// ROUTE 4: Update an existing faculty using: PUT "/api/faculty/updatefaculty". facultyUI
-router.put('/updatefaculty',
-  fetchfaculty, async (req, res) => {
+// ROUTE 4: Update an existing admin using: PUT "/api/admin/updateadmin". adminUI
+router.put('/updateadmin',
+  fetchadmin, async (req, res) => {
     const { name, email, phone_number,office_location } = req.body;
     try {
-      const newfaculty = {};
-      if (name) { newfaculty.name = name };
-      if (office_location) { newfaculty.office_location = office_location };
+      const newadmin = {};
+      if (name) { newadmin.name = name };
+      if (office_location) { newadmin.office_location = office_location };
       if (email) {
-        let faculty = await Faculty.findOne({ email: req.body.email });
-        if (faculty) {
-          if (faculty.id != req.faculty.id) {
-            return res.status(400).json({ error: "Sorry a faculty with this email already exists" })
+        let admin = await Admin.findOne({ email: req.body.email });
+        if (admin) {
+          if (admin.id != req.admin.id) {
+            return res.status(400).json({ error: "Sorry a admin with this email already exists" })
           }
         }
-        newfaculty.email = email
+        newadmin.email = email
       };
       if (phone_number) {
-        let faculty = await Faculty.findOne({ phone_number: req.body.phone_number });
-        if (faculty) {
-          if (faculty.id != req.faculty.id) {
-            return res.status(400).json({ error: "Sorry a faculty with this phone number already exists" })
+        let admin = await Admin.findOne({ phone_number: req.body.phone_number });
+        if (admin) {
+          if (admin.id != req.admin.id) {
+            return res.status(400).json({ error: "Sorry a admin with this phone number already exists" })
           }
         }
-        newfaculty.phone_number = phone_number
+        newadmin.phone_number = phone_number
       };
-      // Find the faculty to be updated and update it
-      let faculty = await Faculty.findById(req.faculty.id);
-      if (!faculty) { return res.status(404).send("Not Found") }
+      // Find the admin to be updated and update it
+      let admin = await Admin.findById(req.admin.id);
+      if (!admin) { return res.status(404).send("Not Found") }
 
-      faculty = await Faculty.findByIdAndUpdate(req.faculty.id, { $set: newfaculty }, { new: true })
+      admin = await Admin.findByIdAndUpdate(req.admin.id, { $set: newadmin }, { new: true })
       const data = {
-        faculty: {
-          id: faculty.id,
-          name: faculty.name,
-          phone_number: faculty.phone_number,
-          email: faculty.email,
-          office_location: faculty.office_location,
-          role:faculty.role,
+        admin: {
+          id: admin.id,
+          name: admin.name,
+          phone_number: admin.phone_number,
+          email: admin.email,
+          office_location: admin.office_location,
+          role:admin.role,
         }
       }
       res.json({ data });
@@ -203,12 +203,12 @@ router.put('/updatefaculty',
       res.status(500).send("Internal Server Error");
     }
   })
-// ROUTE 5: change Password a faculty using: POST "/api/faculty/changepassword". facultyUI
-//takes oldpassword,newpassword,facultyid
+// ROUTE 5: change Password a admin using: POST "/api/admin/changepassword". adminUI
+//takes oldpassword,newpassword,adminid
 router.post('/changepassword', [
   body('oldpassword', 'old password cannot be blank').exists(),
   body('newpassword', 'New password cannot be blank').exists(),
-], fetchfaculty, async (req, res) => {
+], fetchadmin, async (req, res) => {
   let success = false;
   // If there are errors, return Bad request and the errors
   const errors = validationResult(req);
@@ -218,24 +218,24 @@ router.post('/changepassword', [
 
   const { oldpassword, newpassword } = req.body;
   try {
-    let faculty = await Faculty.findById(req.faculty.id);
-    if (!faculty) {
+    let admin = await Admin.findById(req.admin.id);
+    if (!admin) {
       success = false
-      return res.status(400).json({ error: "faculty not Exists" });
+      return res.status(400).json({ error: "admin not Exists" });
     }
 
-    const passwordCompare = await bcrypt.compare(oldpassword, faculty.password);
+    const passwordCompare = await bcrypt.compare(oldpassword, admin.password);
     if (!passwordCompare) {
       success = false
       return res.status(400).json({ success, error: "Please Enter Correct old Password" });
     }
     const salt = await bcrypt.genSalt(10);
     const secPass = await bcrypt.hash(newpassword, salt);
-    faculty.password = secPass
+    admin.password = secPass
 
-    let facultyr = await Faculty.findByIdAndUpdate(req.faculty.id, { $set: faculty }, { new: true })
+    let adminr = await Admin.findByIdAndUpdate(req.admin.id, { $set: admin }, { new: true })
     success = true;
-    res.json({ success, facultyr })
+    res.json({ success, adminr })
 
   } catch (error) {
     console.error(error.message);
@@ -244,7 +244,7 @@ router.post('/changepassword', [
 
 
 });
-// ROUTE 6: email send  using: POST "/api/faculty/sendemail". facultyUI
+// ROUTE 6: email send  using: POST "/api/admin/sendemail". adminUI
 //takes email in body
 router.post('/sendemail', async (req, res) => {
   let success = false;
@@ -255,15 +255,15 @@ router.post('/sendemail', async (req, res) => {
   }
 
   try {
-    let faculty = await Faculty.findOne({ email: req.body.email });
-    if (!faculty) {
+    let admin = await Admin.findOne({ email: req.body.email });
+    if (!admin) {
       success = false
-      return res.status(400).json({ error: "faculty with this email not Exists" });
+      return res.status(400).json({ error: "admin with this email not Exists" });
     }
     let generatedotp = Math.floor((Math.random() * 10000) + 1)
-    const data = await Faculty.updateOne({ email: req.body.email }, { $set: { otp: generatedotp } })
+    const data = await Admin.updateOne({ email: req.body.email }, { $set: { otp: generatedotp } })
 
-    sendmail(faculty.name, faculty.email, generatedotp)
+    sendmail(admin.name, admin.email, generatedotp)
     success = true
     res.json({ success, msg: "Email Sent Successfully" })
   } catch (error) {
@@ -274,7 +274,7 @@ router.post('/sendemail', async (req, res) => {
 
 });
 
-//ROUTE 7: verify otp using: POST "/api/faculty/updatepassword". facultyUI
+//ROUTE 7: verify otp using: POST "/api/admin/updatepassword". adminUI
 //takes email,otp,password in body
 router.post('/updatepassword', async (req, res) => {
   let success = false;
@@ -285,13 +285,13 @@ router.post('/updatepassword', async (req, res) => {
   }
 
   try {
-    const faculty = await Faculty.findOne({ email: req.body.email })
-    if (faculty.otp == req.body.otp) {
+    const admin = await Admin.findOne({ email: req.body.email })
+    if (admin.otp == req.body.otp) {
       const salt = await bcrypt.genSalt(10);
     const secPass = await bcrypt.hash(req.body.password, salt);
-    faculty.password = secPass
+    admin.password = secPass
 
-    let facultyr = await Faculty.findByIdAndUpdate(faculty.id, { $set: faculty }, { new: true })
+    let adminr = await Admin.findByIdAndUpdate(admin.id, { $set: admin }, { new: true })
     success = true;
     res.json({ success, msg: "Password Changed Successfully" })
     }
@@ -303,17 +303,6 @@ router.post('/updatepassword', async (req, res) => {
 
 
 });
-// ROUTE 8: Get all faculty members Details using: POST "/api/faculty/getallfaculty". facultyUI
-router.get('/getallfaculty', async (req, res) => {
-
-  try {
-    const faculty = await Faculty.find().select("-password")
-    res.send(faculty)
-  } catch (error) {
-    console.error(error.message);
-    res.status(500).send("Internal Server Error");
-  }
-})
 
 
 

@@ -30,7 +30,8 @@ const StudentSchema = new Schema({
     },
     role:{
         type:String,
-        required:true
+        required:true,
+        default:"student"
     }
   });
   const Student = mongoose.model('student', StudentSchema);

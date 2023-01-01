@@ -303,6 +303,16 @@ router.post('/updatepassword', async (req, res) => {
 
 
 });
+// ROUTE 8: Get all student Details using: get "/api/student/getallstudent". studentUI
+router.get('/getallstudent', async (req, res) => {
 
+  try {
+    const student = await Student.find().select("-password")
+    res.send(student)
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Internal Server Error");
+  }
+})
 
 module.exports = router

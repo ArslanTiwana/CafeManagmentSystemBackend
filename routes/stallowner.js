@@ -1,5 +1,6 @@
 const express = require('express');
 const StallOwner = require('../models/StallOwner');
+const Stall = require('../models/Stall');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
@@ -295,7 +296,24 @@ router.post('/updatepassword', async (req, res) => {
 
 
 });
+// ROUTE 8: Get all stallowners Details using: POST "/api/stallowner/getallstallowner". stallownerUI
+router.get('/getallstallowner', async (req, res) => {
 
+  try {
+    let allstallowners=[]
+    const stallowner = await StallOwner.find().select("-password")
+    for(let i=0;i<stallowner.length;i++){
+      allstallowners[i]={
+        "stallowner":stallowner[i],
+        "stall":await Stall.find({stall_owner:stallowner[i]._id})
+      }
+    }
+    res.send({allstallowners})
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Internal Server Error");
+  }
+})
 
 
 module.exports = router
