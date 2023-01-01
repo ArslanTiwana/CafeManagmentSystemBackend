@@ -314,5 +314,19 @@ router.get('/getallstudent', async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 })
+// ROUTE 9: Delete an existing student using: DELETE "/api/student/deletestudent".
+router.delete('/deletestudent/:id', async (req, res) => {
+  try {
+      let stalls = []
+      let student = await Student.findById(req.params.id);
+      if (!student) { return res.status(404).send("Not Found") }
+      student = await Student.findByIdAndDelete(req.params.id)
+     
+      res.json({ "Success": "student has been deleted", student: student });
+  } catch (error) {
+      console.error(error.message);
+      res.status(500).send("Internal Server Error");
+  }
+})
 
 module.exports = router

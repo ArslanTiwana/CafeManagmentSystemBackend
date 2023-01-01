@@ -314,6 +314,23 @@ router.get('/getallstallowner', async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 })
+// ROUTE 9: Delete an existing stallowner using: DELETE "/api/stallowner/deletestallowner".
+router.delete('/deletestallowner/:id', async (req, res) => {
+  try {
+      let stallowner = await StallOwner.findById(req.params.id);
+      if (!stallowner) { return res.status(404).send("Not Found") }
+      stallowner = await StallOwner.findByIdAndDelete(req.params.id)
+      let stalls = await Stall.find({ stall_owner: stallowner._id })
+      for (let i = 0; i < stalls.length; i++) {
+          stalls[i].stall_owner = null
+          let stall = await Stall.findByIdAndUpdate(stalls[i]._id, { $set: stalls[i] }, { new: true })
+      }
+      res.json({ "Success": "stallowner has been deleted", stallowner: stallowner });
+  } catch (error) {
+      console.error(error.message);
+      res.status(500).send("Internal Server Error");
+  }
+})
 
 
 module.exports = router

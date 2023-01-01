@@ -314,6 +314,20 @@ router.get('/getallfaculty', async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 })
+// ROUTE 9: Delete an existing faculty using: DELETE "/api/faculty/deletefaculty".
+router.delete('/deletefaculty/:id', async (req, res) => {
+  try {
+      let stalls = []
+      let faculty = await Faculty.findById(req.params.id);
+      if (!faculty) { return res.status(404).send("Not Found") }
+      faculty = await Faculty.findByIdAndDelete(req.params.id)
+     
+      res.json({ "Success": "faculty has been deleted", faculty: faculty });
+  } catch (error) {
+      console.error(error.message);
+      res.status(500).send("Internal Server Error");
+  }
+})
 
 
 
